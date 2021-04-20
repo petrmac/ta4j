@@ -29,7 +29,7 @@ public class TTMDotIndicator extends CachedIndicator<Boolean> {
     private final KeltnerChannelLowerIndicator keltnerLower;
     private final KeltnerChannelUpperIndicator keltnerUpper;
 
-    protected TTMDotIndicator(BarSeries series, final int emaPeriod, final double atrMultiplier, final int atrPeriod) {
+    public TTMDotIndicator(BarSeries series, final int emaPeriod, final double atrMultiplier, final int atrPeriod) {
         super(series);
         this.emaPeriod = emaPeriod;
         this.atrPeriod = atrPeriod;
@@ -64,4 +64,30 @@ public class TTMDotIndicator extends CachedIndicator<Boolean> {
     protected Boolean calculate(int index) {
         return isBBAboveKeltnerUpper(index) || isBBBelowKeltnerLower(index);
     }
+
+    public BollingerBandsMiddleIndicator getBbMiddle() {
+        return bbMiddle;
+    }
+
+    public BollingerBandsLowerIndicator getBbLower() {
+        return bbLower;
+    }
+
+    public BollingerBandsUpperIndicator getBbUpper() {
+        return bbUpper;
+    }
+
+    public KeltnerChannelMiddleIndicator getKeltnerMiddle() {
+        return keltnerMiddle;
+    }
+
+    public KeltnerChannelLowerIndicator getKeltnerLower() {
+        return keltnerLower;
+    }
+
+    public KeltnerChannelUpperIndicator getKeltnerUpper() {
+        return keltnerUpper;
+    }
+
+
 }
