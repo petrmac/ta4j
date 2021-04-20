@@ -25,6 +25,6 @@ public class DonchianMiddleIndicator extends CachedIndicator<Num> {
     @Override
     protected Num calculate(int index) {
         return (donchianUpperIndicator.getValue(index)
-                .minus(donchianLowerIndicator.getValue(index))).dividedBy(numOf(2));
+                .plus(donchianLowerIndicator.getValue(index))).dividedBy(numOf(2));
     }
 }

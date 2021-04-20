@@ -30,10 +30,10 @@ public class TTMMomentumHistogramTest extends AbstractIndicatorTest<Indicator<Nu
     @Test
     public void upDownAndHigh() {
         TTMMomentumHistogram ttmMomentumHistogram = new TTMMomentumHistogram(data, 20, 20);
-        assertNumEquals(31366.0025, ttmMomentumHistogram.getValue(20));
-        assertNumEquals(31154.43, ttmMomentumHistogram.getValue(21));
-        assertNumEquals(31175.5575, ttmMomentumHistogram.getValue(22));
+        assertNumEquals(57.0525, ttmMomentumHistogram.getValue(20));
+        assertNumEquals(-154.52, ttmMomentumHistogram.getValue(21));
+        assertNumEquals(-133.3925, ttmMomentumHistogram.getValue(22));
 
-        assertNumEquals(30998.525, ttmMomentumHistogram.getValue(30));
+        assertNumEquals(-176.475, ttmMomentumHistogram.getValue(30));
     }
 }
