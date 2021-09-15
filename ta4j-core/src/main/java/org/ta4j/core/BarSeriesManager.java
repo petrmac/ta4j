@@ -26,8 +26,8 @@ package org.ta4j.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ta4j.core.Trade.TradeType;
-import org.ta4j.core.cost.CostModel;
-import org.ta4j.core.cost.ZeroCostModel;
+import org.ta4j.core.analysis.cost.CostModel;
+import org.ta4j.core.analysis.cost.ZeroCostModel;
 import org.ta4j.core.num.Num;
 
 /**
@@ -42,18 +42,11 @@ public class BarSeriesManager {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     /** The managed bar series */
-    private BarSeries barSeries;
+    private final BarSeries barSeries;
 
     /** The trading cost models */
     private CostModel transactionCostModel;
     private CostModel holdingCostModel;
-
-    /**
-     * Constructor.
-     */
-    public BarSeriesManager() {
-        this(null, new ZeroCostModel(), new ZeroCostModel());
-    }
 
     /**
      * Constructor.
@@ -75,13 +68,6 @@ public class BarSeriesManager {
         this.barSeries = barSeries;
         this.transactionCostModel = transactionCostModel;
         this.holdingCostModel = holdingCostModel;
-    }
-
-    /**
-     * @param barSeries the bar series to be managed
-     */
-    public void setBarSeries(BarSeries barSeries) {
-        this.barSeries = barSeries;
     }
 
     /**
@@ -174,8 +160,10 @@ public class BarSeriesManager {
         int runBeginIndex = Math.max(startIndex, barSeries.getBeginIndex());
         int runEndIndex = Math.min(finishIndex, barSeries.getEndIndex());
 
-        log.trace("Running strategy (indexes: {} -> {}): {} (starting with {})", runBeginIndex, runEndIndex, strategy,
-                tradeType);
+        if (log.isTraceEnabled()) {
+            log.trace("Running strategy (indexes: {} -> {}): {} (starting with {})", runBeginIndex, runEndIndex,
+                    strategy, tradeType);
+        }
         TradingRecord tradingRecord = new BaseTradingRecord(tradeType, transactionCostModel, holdingCostModel);
         for (int i = runBeginIndex; i <= runEndIndex; i++) {
             // For each bar between both indexes...

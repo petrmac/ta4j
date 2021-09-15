@@ -29,10 +29,10 @@ import org.ta4j.core.BarSeriesManager;
 import org.ta4j.core.BaseStrategy;
 import org.ta4j.core.Rule;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.criteria.ReturnOverMaxDrawdownCriterion;
-import org.ta4j.core.analysis.criteria.VersusBuyAndHoldCriterion;
-import org.ta4j.core.analysis.criteria.WinningPositionsRatioCriterion;
-import org.ta4j.core.analysis.criteria.pnl.GrossReturnCriterion;
+import org.ta4j.core.criteria.ReturnOverMaxDrawdownCriterion;
+import org.ta4j.core.criteria.VersusBuyAndHoldCriterion;
+import org.ta4j.core.criteria.WinningPositionsRatioCriterion;
+import org.ta4j.core.criteria.pnl.GrossReturnCriterion;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import org.ta4j.core.num.Num;
@@ -87,7 +87,8 @@ public class Quickstart {
         // - or if the price loses more than 3%
         // - or if the price earns more than 2%
         Rule sellingRule = new CrossedDownIndicatorRule(shortSma, longSma)
-                .or(new StopLossRule(closePrice, series.numOf(3))).or(new StopGainRule(closePrice, series.numOf(2)));
+                .or(new StopLossRule(closePrice, series.numOf(3)))
+                .or(new StopGainRule(closePrice, series.numOf(2)));
 
         // Running our juicy trading strategy...
         BarSeriesManager seriesManager = new BarSeriesManager(series);

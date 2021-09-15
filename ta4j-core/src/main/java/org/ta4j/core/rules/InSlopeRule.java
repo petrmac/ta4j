@@ -27,7 +27,7 @@ import static org.ta4j.core.num.NaN.NaN;
 
 import org.ta4j.core.Indicator;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.indicators.helpers.DifferenceIndicator;
+import org.ta4j.core.indicators.helpers.CombineIndicator;
 import org.ta4j.core.indicators.helpers.PreviousValueIndicator;
 import org.ta4j.core.num.Num;
 
@@ -102,9 +102,10 @@ public class InSlopeRule extends AbstractRule {
         this.maxSlope = maxSlope;
     }
 
+    /** This rule does not use the {@code tradingRecord}. */
     @Override
     public boolean isSatisfied(int index, TradingRecord tradingRecord) {
-        DifferenceIndicator diff = new DifferenceIndicator(ref, prev);
+        CombineIndicator diff = CombineIndicator.minus(ref, prev);
         Num val = diff.getValue(index);
         boolean minSlopeSatisfied = minSlope.isNaN() || val.isGreaterThanOrEqual(minSlope);
         boolean maxSlopeSatisfied = maxSlope.isNaN() || val.isLessThanOrEqual(maxSlope);

@@ -23,6 +23,9 @@
  */
 package org.ta4j.core;
 
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.ta4j.core.num.Num;
 
 /**
@@ -60,16 +63,16 @@ public interface Indicator<T> {
      * @return array of Doubles within the barCount
      */
     static Double[] toDouble(Indicator<Num> ref, int index, int barCount) {
-
-        Double[] all = new Double[barCount];
-
         int startIndex = Math.max(0, index - barCount + 1);
-        for (int i = 0; i < barCount; i++) {
-            Num number = ref.getValue(i + startIndex);
-            all[i] = number.doubleValue();
-        }
+        return IntStream.range(startIndex, startIndex + barCount)
+                .mapToObj(ref::getValue)
+                .map(Num::doubleValue)
+                .toArray(Double[]::new);
+    }
 
-        return all;
+    default Stream<T> stream() {
+        return IntStream.range(getBarSeries().getBeginIndex(), getBarSeries().getEndIndex() + 1)
+                .mapToObj(this::getValue);
     }
 
 }

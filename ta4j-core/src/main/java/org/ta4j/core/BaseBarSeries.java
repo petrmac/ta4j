@@ -322,8 +322,10 @@ public class BaseBarSeries implements BarSeries {
                 // Cannot return the i-th bar if i < 0
                 throw new IndexOutOfBoundsException(buildOutOfBoundsMessage(this, i));
             }
-            log.trace("Bar series `{}` ({} bars): bar {} already removed, use {}-th instead", name, bars.size(), i,
-                    removedBarsCount);
+            if (log.isTraceEnabled()) {
+                log.trace("Bar series `{}` ({} bars): bar {} already removed, use {}-th instead", name, bars.size(), i,
+                        removedBarsCount);
+            }
             if (bars.isEmpty()) {
                 throw new IndexOutOfBoundsException(buildOutOfBoundsMessage(this, removedBarsCount));
             }
@@ -475,8 +477,10 @@ public class BaseBarSeries implements BarSeries {
         if (barCount > maximumBarCount) {
             // Removing old bars
             int nbBarsToRemove = barCount - maximumBarCount;
-            for (int i = 0; i < nbBarsToRemove; i++) {
+            if (nbBarsToRemove == 1) {
                 bars.remove(0);
+            } else {
+                bars.subList(0, nbBarsToRemove).clear();
             }
             // Updating removed bars count
             removedBarsCount += nbBarsToRemove;

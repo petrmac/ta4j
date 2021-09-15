@@ -1,6 +1,56 @@
 Changelog for `ta4j`, roughly following [keepachangelog.com](http://keepachangelog.com/en/1.0.0/) from version 0.9 onwards.
 
-## 0.14 (unreleased)
+## 0.15 (unreleased)
+
+### Breaking
+- **DifferencePercentage** renamed to **`DifferencePercentageIndicator`**
+- **BuyAndHoldCriterion** renamed to **`EnterAndHoldCriterion`**
+- **DXIndicator** moved to adx-package
+- **PlusDMIndicator** moved to adx-package
+- **MinusDMIndicator** moved to adx-package
+- `analysis/criterion`-package moved to root
+- `cost`-package moved to `analysis/cost`-package
+
+### Fixed
+- **LosingPositionsRatioCriterion** correct betterThan
+- **VersusBuyAndHoldCriterionTest** NaN-Error.
+- **Fixed** **`ChaikinOscillatorIndicatorTest`**
+- **DecimalNum#remainder()** adds NaN-check 
+- **Fixed** **ParabolicSarIndicatorTest** fixed openPrice always 0 and highPrice lower than lowPrice
+
+### Changed
+- **KeltnerChannelMiddleIndicator** changed superclass to AbstractIndicator; add GetBarCount() and toString()
+- **KeltnerChannelUpperIndicator** add constructor to accept pre-constructed ATR; add GetBarCount() and toString()
+- **KeltnerChannelLowerIndicator** add constructor to accept pre-constructed ATR; add GetBarCount() and toString()
+- **BarSeriesManager** removed empty args constructor
+- **Open|High|Low|Close** do not cache price values anymore
+- **DifferenceIndicator(i1,i2)** replaced by the more flexible CombineIndicator.minus(i1,i2)
+
+### Removed/Deprecated
+- **Num** removed Serializable
+- **PriceIndicator** removed
+
+### Added
+- **AbstractEMAIndicator** added getBarCount() to support future enhancements 
+- **ATRIndicator** "uncached" by changing superclass to AbstractIndicator; added constructor to accept TRIndicator and getter for same; added toString(); added getBarCount() to support future enhancements
+- :tada: **Enhancement** added possibility to use CostModels when backtesting with the BacktestExecutor
+- :tada: **Enhancement** added Num#zero, Num#one, Num#hundred
+- :tada: **Enhancement** added possibility to use CostModels when backtesting with the BacktestExecutor
+- :tada: **Enhancement** added Indicator#stream() method
+- :tada: **Enhancement** added a new CombineIndicator, which can combine the values of two Num Indicators with a given combine-function
+- **Example** added a json serialization and deserialization example of BarSeries using google-gson library
+- **EnterAndHoldCriterion** added constructor with TradeType to begin with buy or sell
+- :tada: **Enhancement** added Position#getStartingType() method
+- :tada: **Enhancement** added **`SqnCriterion`**
+- :tada: **Enhancement** added **`StandardDeviationCriterion`**
+- :tada: **Enhancement** added **`RelativeStandardDeviationCriterion`**
+- :tada: **Enhancement** added **`StandardErrorCriterion`**
+- :tada: **Enhancement** added **`VarianceCriterion`**
+- :tada: **Enhancement** added **`AverageCriterion`**
+- :tada: **Enhancement** added javadoc for all rules to make clear which rule makes use of a TradingRecord
+- **Enhancement** prevent Object[] allocation for varargs log.trace and log.debug calls by wrapping them in `if` blocks
+
+## 0.14 (released April 25, 2021)
 
 ### Breaking
 - **Breaking:** **`PrecisionNum`** renamed to **`DecimalNum`**
