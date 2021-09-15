@@ -29,33 +29,28 @@ import org.ta4j.core.TradingRecord;
 import org.ta4j.core.num.Num;
 
 /**
- * Calculates the percentage of positions which are profitable.
+ * Calculates the percentage of positions which are not profitable.
  *
- * Defined as <code># of winning positions / total # of positions</code>.
+ * Defined as <code># of losing positions / total # of positions</code>.
  */
 public class LosingPositionsRatioCriterion extends AbstractAnalysisCriterion {
 
+    private NumberOfLosingPositionsCriterion numberOfLosingPositionsCriterion = new NumberOfLosingPositionsCriterion();
+
     @Override
     public Num calculate(BarSeries series, Position position) {
-        return isLosingPosition(series, position) ? series.numOf(1) : series.numOf(0);
-    }
-
-    private boolean isLosingPosition(BarSeries series, Position position) {
-        if (position.isClosed()) {
-            Num zero = series.numOf(0);
-            return position.getProfit().isLessThan(zero);
-        }
-        return false;
+        return numberOfLosingPositionsCriterion.calculate(series, position);
     }
 
     @Override
     public Num calculate(BarSeries series, TradingRecord tradingRecord) {
-        long numberOfLosses = tradingRecord.getPositions().stream().filter(t -> isLosingPosition(series, t)).count();
-        return series.numOf(numberOfLosses).dividedBy(series.numOf(tradingRecord.getPositionCount()));
+        Num numberOfLosingPositions = numberOfLosingPositionsCriterion.calculate(series, tradingRecord);
+        numberOfLosingPositionsCriterion.calculate(series, tradingRecord);
+        return numberOfLosingPositions.dividedBy(series.numOf(tradingRecord.getPositionCount()));
     }
 
     @Override
     public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isLessThan(criterionValue2);
+        return criterionValue1.isGreaterThan(criterionValue2);
     }
 }

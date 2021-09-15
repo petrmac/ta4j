@@ -23,21 +23,19 @@
  */
 package org.ta4j.core.analysis.criteria;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.TestUtils.assertNumEquals;
+
+import java.util.function.Function;
+
 import org.junit.Test;
 import org.ta4j.core.AnalysisCriterion;
-import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseTradingRecord;
-import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.mocks.MockBarSeries;
 import org.ta4j.core.num.Num;
-
-import java.util.function.Function;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
 
 public class ExpectancyCriterionTest extends AbstractCriterionTest {
 
@@ -46,51 +44,65 @@ public class ExpectancyCriterionTest extends AbstractCriterionTest {
     }
 
     @Test
-    public void calculate() {
-        BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d, 115d, 120d, 110d, 90d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series), // losing
-                                                                                                             // -5
-                Trade.buyAt(2, series), Trade.sellAt(3, series), // winning +3
-                Trade.buyAt(4, series), Trade.sellAt(5, series), // winning +16
-                Trade.buyAt(6, series), Trade.sellAt(8, series) // losing -5
-        );
-        // avg win: 9,5 ((3+16) / 2) , avg loss: 5 ((5+5) / 2) - > RR = 9.5 / 5 = 1.9
-        // 50% win ratio
-        // 9.5 * 0.5 - 5 * 0.5 = 2.25
+    public void calculateOnlyWithProfitPositions() {
+        MockBarSeries series = new MockBarSeries(numFunction, 100, 110, 120, 130, 150, 160);
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
+                Trade.buyAt(3, series), Trade.sellAt(5, series));
 
-        AnalysisCriterion expectancy = getCriterion();
-
-        assertNumEquals(2.25d, expectancy.calculate(series, tradingRecord));
+        AnalysisCriterion avgLoss = getCriterion();
+        assertNumEquals(0, avgLoss.calculate(series, tradingRecord));
     }
 
     @Test
-    public void calculateWithShortPositions() {
-        BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(2, series),
-                Trade.sellAt(3, series), Trade.buyAt(4, series));
-        AnalysisCriterion expectancy = getCriterion();
+    public void calculateWithMixedPositions() {
+        MockBarSeries series = new MockBarSeries(numFunction, 100, 110, 80, 130, 150, 160);
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(2, series),
+                Trade.buyAt(3, series), Trade.sellAt(5, series));
 
-        assertNumEquals(3d, expectancy.calculate(series, tradingRecord));
+        AnalysisCriterion avgLoss = getCriterion();
+        assertNumEquals(-1.25, avgLoss.calculate(series, tradingRecord));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void calculateWithOnePosition() {
-        BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d);
-        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
+    @Test
+    public void calculateOnlyWithLossPositions() {
+        MockBarSeries series = new MockBarSeries(numFunction, 100, 95, 80, 70, 60, 50);
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
+                Trade.buyAt(2, series), Trade.sellAt(5, series));
 
-        AnalysisCriterion average = getCriterion();
-        average.calculate(series, position);
+        AnalysisCriterion avgLoss = getCriterion();
+        assertNumEquals(0, avgLoss.calculate(series, tradingRecord));
+    }
+
+    @Test
+    public void calculateProfitWithShortPositions() {
+        MockBarSeries series = new MockBarSeries(numFunction, 160, 140, 120, 100, 80, 60);
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
+                Trade.sellAt(2, series), Trade.buyAt(5, series));
+
+        AnalysisCriterion avgLoss = getCriterion();
+        assertNumEquals(0, avgLoss.calculate(series, tradingRecord));
+    }
+
+    @Test
+    public void calculateProfitWithMixedShortPositions() {
+        MockBarSeries series = new MockBarSeries(numFunction, 160, 200, 120, 100, 80, 60);
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(1, series),
+                Trade.sellAt(2, series), Trade.buyAt(5, series));
+
+        AnalysisCriterion avgLoss = getCriterion();
+        assertNumEquals(-1.25, avgLoss.calculate(series, tradingRecord));
     }
 
     @Test
     public void betterThan() {
         AnalysisCriterion criterion = getCriterion();
-        assertTrue(criterion.betterThan(numOf(12), numOf(8)));
-        assertFalse(criterion.betterThan(numOf(8), numOf(12)));
+        assertTrue(criterion.betterThan(numOf(2.0), numOf(1.5)));
+        assertFalse(criterion.betterThan(numOf(1.5), numOf(2.0)));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testCalculateOneOpenPositionShouldReturnZero() {
         openedPositionUtils.testCalculateOneOpenPositionShouldReturnExpectedValue(numFunction, getCriterion(), 0);
     }
+
 }

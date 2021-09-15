@@ -23,6 +23,12 @@
  */
 package org.ta4j.core.analysis.criteria;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.ta4j.core.TestUtils.assertNumEquals;
+
+import java.util.function.Function;
+
 import org.junit.Test;
 import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.BarSeries;
@@ -33,12 +39,6 @@ import org.ta4j.core.TradingRecord;
 import org.ta4j.core.mocks.MockBarSeries;
 import org.ta4j.core.num.Num;
 
-import java.util.function.Function;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.ta4j.core.TestUtils.assertNumEquals;
-
 public class LosingPositionsRatioCriterionTest extends AbstractCriterionTest {
 
     public LosingPositionsRatioCriterionTest(Function<Number, Num> numFunction) {
@@ -48,9 +48,8 @@ public class LosingPositionsRatioCriterionTest extends AbstractCriterionTest {
     @Test
     public void calculate() {
         BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d);
-        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series), // losing
-                Trade.buyAt(2, series), Trade.sellAt(3, series), // winning
-                Trade.buyAt(4, series), Trade.sellAt(5, series)); // winning
+        TradingRecord tradingRecord = new BaseTradingRecord(Trade.buyAt(0, series), Trade.sellAt(1, series),
+                Trade.buyAt(2, series), Trade.sellAt(3, series), Trade.buyAt(4, series), Trade.sellAt(5, series));
 
         AnalysisCriterion average = getCriterion();
 
@@ -83,8 +82,8 @@ public class LosingPositionsRatioCriterionTest extends AbstractCriterionTest {
     @Test
     public void betterThan() {
         AnalysisCriterion criterion = getCriterion();
-        assertFalse(criterion.betterThan(numOf(12), numOf(8)));
-        assertTrue(criterion.betterThan(numOf(8), numOf(12)));
+        assertTrue(criterion.betterThan(numOf(12), numOf(8)));
+        assertFalse(criterion.betterThan(numOf(8), numOf(12)));
     }
 
     @Test
