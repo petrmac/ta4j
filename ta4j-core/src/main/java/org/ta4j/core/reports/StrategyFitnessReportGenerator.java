@@ -26,11 +26,11 @@ package org.ta4j.core.reports;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Strategy;
 import org.ta4j.core.TradingRecord;
-import org.ta4j.core.analysis.criteria.AverageLossCriterion;
-import org.ta4j.core.analysis.criteria.AverageProfitLossCriterion;
-import org.ta4j.core.analysis.criteria.AverageProfitCriterion;
-import org.ta4j.core.analysis.criteria.ExpectancyCriterion;
-import org.ta4j.core.analysis.criteria.RewardToRiskCriterion;
+import org.ta4j.core.criteria.AverageLossCriterion;
+import org.ta4j.core.criteria.AverageProfitLossCriterion;
+import org.ta4j.core.criteria.AverageProfitCriterion;
+import org.ta4j.core.criteria.RewardToRiskCriterion;
+import org.ta4j.core.criteria.ExpectancyCriterion;
 import org.ta4j.core.num.Num;
 
 public class StrategyFitnessReportGenerator implements ReportGenerator<StrategyFitnessReport> {

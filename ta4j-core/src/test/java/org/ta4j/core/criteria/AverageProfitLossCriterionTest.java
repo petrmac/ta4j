@@ -21,7 +21,7 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.analysis.criteria;
+package org.ta4j.core.criteria;
 
 import org.junit.Test;
 import org.ta4j.core.AnalysisCriterion;
@@ -30,6 +30,8 @@ import org.ta4j.core.BaseTradingRecord;
 import org.ta4j.core.Position;
 import org.ta4j.core.Trade;
 import org.ta4j.core.TradingRecord;
+import org.ta4j.core.criteria.AbstractCriterionTest;
+import org.ta4j.core.criteria.AverageProfitLossCriterion;
 import org.ta4j.core.mocks.MockBarSeries;
 import org.ta4j.core.num.Num;
 
@@ -39,10 +41,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.ta4j.core.TestUtils.assertNumEquals;
 
-public class AverageProfitCriterionTest extends AbstractCriterionTest {
+public class AverageProfitLossCriterionTest extends AbstractCriterionTest {
 
-    public AverageProfitCriterionTest(Function<Number, Num> numFunction) {
-        super((params) -> new AverageProfitCriterion(), numFunction);
+    public AverageProfitLossCriterionTest(Function<Number, Num> numFunction) {
+        super((params) -> new AverageProfitLossCriterion(), numFunction);
     }
 
     @Test
@@ -54,12 +56,11 @@ public class AverageProfitCriterionTest extends AbstractCriterionTest {
                 Trade.buyAt(4, series), Trade.sellAt(5, series), // winning +16
                 Trade.buyAt(6, series), Trade.sellAt(8, series) // losing -5
         );
-        // (-5 + 3 + 16 -5) / 4 = 2.25 avg pnl
-        // (3 + 16) / 2 = 9.5
+        // (-5 + 3 + 16 -5) / 4 = 2.25
 
-        AnalysisCriterion avgWin = getCriterion();
+        AnalysisCriterion avgPnl = getCriterion();
 
-        assertNumEquals(9.5d, avgWin.calculate(series, tradingRecord));
+        assertNumEquals(2.25d, avgPnl.calculate(series, tradingRecord));
     }
 
     @Test
@@ -67,18 +68,18 @@ public class AverageProfitCriterionTest extends AbstractCriterionTest {
         BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d);
         TradingRecord tradingRecord = new BaseTradingRecord(Trade.sellAt(0, series), Trade.buyAt(2, series),
                 Trade.sellAt(3, series), Trade.buyAt(4, series));
-        AnalysisCriterion avgWin = getCriterion();
+        AnalysisCriterion avgPnl = getCriterion();
 
-        assertNumEquals(8d, avgWin.calculate(series, tradingRecord));
+        assertNumEquals(3d, avgPnl.calculate(series, tradingRecord));
     }
 
     @Test
     public void calculateWithOnePosition() {
         BarSeries series = new MockBarSeries(numFunction, 100d, 95d, 102d, 105d, 97d, 113d);
-        Position position = new Position(Trade.sellAt(0, series), Trade.buyAt(1, series));
+        Position position = new Position(Trade.buyAt(0, series), Trade.sellAt(1, series));
 
         AnalysisCriterion average = getCriterion();
-        assertNumEquals(5d, average.calculate(series, position));
+        assertNumEquals(-5d, average.calculate(series, position));
     }
 
     @Test

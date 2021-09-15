@@ -21,42 +21,42 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.ta4j.core.analysis.criteria;
+package org.ta4j.core.criteria;
 
-import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.Position;
 import org.ta4j.core.TradingRecord;
+import org.ta4j.core.criteria.AbstractAnalysisCriterion;
 import org.ta4j.core.num.Num;
+import org.ta4j.core.utils.NumUtils;
 
 /**
- * The risk to reward ratio is the average size of a profitable trade divided by
- * the average size of a losing trade. Imagine that in your trading strategy
- * your winners are 5 times larger than your losers. That will make your reward
- * to risk ratio 5.
- * <p>
- * ($500 Winner size) / ($100 Loser size) = 5
+ * This is simple average loss of all losing positions
  */
-public class RewardToRiskCriterion extends AbstractAnalysisCriterion {
+public class AverageLossCriterion extends AbstractAnalysisCriterion {
 
-    private AnalysisCriterion averageWin = new AverageProfitCriterion();
-    private AnalysisCriterion averageLoss = new AverageLossCriterion();
+    private boolean isLosingPosition(BarSeries series, Position position) {
+        if (position.isClosed()) {
+            Num zero = series.numOf(0);
+            return position.getProfit().isLessThan(zero);
+        }
+        return false;
+    }
 
     @Override
     public Num calculate(BarSeries series, Position position) {
-        throw new UnsupportedOperationException("Cannot calculate Reward to Risk ratio from one position");
+        return position.getProfit().abs();
     }
 
     @Override
     public Num calculate(BarSeries series, TradingRecord tradingRecord) {
-        final Num averageLossValue = averageLoss.calculate(series, tradingRecord);
-        final Num averageWinValue = averageWin.calculate(series, tradingRecord);
-
-        return averageWinValue.dividedBy(averageLossValue);
+        final Num value = tradingRecord.getPositions().stream().filter(t -> isLosingPosition(series, t))
+                .map(Position::getProfit).collect(NumUtils.averagingNum((Num t) -> t));
+        return value.abs();
     }
 
     @Override
     public boolean betterThan(Num criterionValue1, Num criterionValue2) {
-        return criterionValue1.isGreaterThan(criterionValue2);
+        return criterionValue1.isLessThan(criterionValue2);
     }
 }
